@@ -7,6 +7,11 @@
 using namespace std;
 using namespace testing;
 
+class MockCustomer : public Customer {
+public:
+	MOCK_METHOD(string, getEmail, (), (override));
+};
+
 class BookingItem : public Test {
 public:
 	tm getTime(int year, int mon, int day, int hour, int min) {
@@ -25,14 +30,17 @@ public:
 	tm ON_THE_HOUR;
 	tm SUNDAY_ON_THE_HOUR;
 	tm MONDAY_ON_THE_HOUR;
-	Customer CUSTOMER{ "Fake name", "010-1234-5678" };
-	Customer CUSTOMER_WITH_MAIL{ "Fake name", "010-1234-5678", "test@test.com" };
+
+	MockCustomer CUSTOMER;
+	MockCustomer CUSTOMER_WITH_MAIL;
+	//Customer CUSTOMER{ "Fake name", "010-1234-5678" };
+	//Customer CUSTOMER_WITH_MAIL{ "Fake name", "010-1234-5678", "test@test.com" };
 	const int UNDER_CAPACITY = 1;
 	const int CAPACITY_PER_HOUR = 3;
 
 	BookingScheduler bookingScheduler{ CAPACITY_PER_HOUR };
-	TestableSmsSender testableSmsSender;
-	TestableMailSender testableMailSender;
+	NiceMock<TestableSmsSender> testableSmsSender;
+	NiceMock<TestableMailSender> testableMailSender;
 
 protected:
 	void SetUp() override {
@@ -41,9 +49,14 @@ protected:
 		SUNDAY_ON_THE_HOUR = getTime(2021, 3, 28, 17, 0);
 		MONDAY_ON_THE_HOUR = getTime(2024, 6, 3, 17, 0);
 
-
 		bookingScheduler.setSmsSender(&testableSmsSender);
 		bookingScheduler.setMailSender(&testableMailSender);
+
+		EXPECT_CALL((CUSTOMER), getEmail)
+			.WillRepeatedly(Return(""));
+		EXPECT_CALL((CUSTOMER_WITH_MAIL), getEmail)
+			.WillRepeatedly(Return("test@test.com"));
+
 	}
 };
 
@@ -93,29 +106,36 @@ TEST_F(BookingItem, 시간대별인원제한이있다같은시간대가다르면Capacity차있어도스케
 TEST_F(BookingItem, 예약완료시SMS는무조건발송) {
 	Schedule* schedule = new Schedule{ ON_THE_HOUR, CAPACITY_PER_HOUR, CUSTOMER };
 
-	bookingScheduler.addSchedule(schedule);
+	EXPECT_CALL(testableSmsSender, send(schedule))
+		.Times(1);
 
-	EXPECT_EQ(true, testableSmsSender.isSendMethodIsCalled());
+	bookingScheduler.addSchedule(schedule);
 }
 
 TEST_F(BookingItem, 이메일이없는경우에는이메일미발송) {
 	Schedule* schedule = new Schedule{ ON_THE_HOUR, CAPACITY_PER_HOUR, CUSTOMER };
 
-	bookingScheduler.addSchedule(schedule);
+	EXPECT_CALL(testableMailSender, sendMail(schedule))
+		.Times(0);
 
-	EXPECT_EQ(0, testableMailSender.getCountSendMailMethodIsCalled());
+	bookingScheduler.addSchedule(schedule);
 }
 
 TEST_F(BookingItem, 이메일이있는경우에는이메일발송) {
 	Schedule* schedule = new Schedule{ ON_THE_HOUR, CAPACITY_PER_HOUR, CUSTOMER_WITH_MAIL };
 
-	bookingScheduler.addSchedule(schedule);
+	EXPECT_CALL(testableMailSender, sendMail(schedule))
+		.Times(1);
 
-	EXPECT_EQ(1, testableMailSender.getCountSendMailMethodIsCalled());
+	bookingScheduler.addSchedule(schedule);
 }
 
 TEST_F(BookingItem, 현재날짜가일요일인경우예약불가예외처리) {
-	BookingScheduler* bookingScheduler = new TestableBookingScheduler{ CAPACITY_PER_HOUR, SUNDAY_ON_THE_HOUR };
+	TestableBookingScheduler mockScheduler{ CAPACITY_PER_HOUR };
+	EXPECT_CALL(mockScheduler, getNow)
+		.WillRepeatedly(Return(mktime(&SUNDAY_ON_THE_HOUR)));
+
+	BookingScheduler* bookingScheduler = &mockScheduler;
 
 	try {
 		Schedule* schedule = new Schedule{ SUNDAY_ON_THE_HOUR, UNDER_CAPACITY, CUSTOMER_WITH_MAIL };
@@ -129,7 +149,11 @@ TEST_F(BookingItem, 현재날짜가일요일인경우예약불가예외처리) {
 }
 
 TEST_F(BookingItem, 현재날짜가일요일이아닌경우예약가능) {
-	BookingScheduler* bookingScheduler = new TestableBookingScheduler{ CAPACITY_PER_HOUR, MONDAY_ON_THE_HOUR };
+	TestableBookingScheduler mockScheduler{ CAPACITY_PER_HOUR };
+	EXPECT_CALL(mockScheduler, getNow)
+		.WillRepeatedly(Return(mktime(&MONDAY_ON_THE_HOUR)));
+
+	BookingScheduler* bookingScheduler = &mockScheduler;
 
 	Schedule* schedule = new Schedule{ MONDAY_ON_THE_HOUR, CAPACITY_PER_HOUR, CUSTOMER_WITH_MAIL };
 	bookingScheduler->addSchedule(schedule);
