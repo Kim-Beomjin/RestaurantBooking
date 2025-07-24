@@ -39,8 +39,8 @@ public:
 	const int CAPACITY_PER_HOUR = 3;
 
 	BookingScheduler bookingScheduler{ CAPACITY_PER_HOUR };
-	TestableSmsSender testableSmsSender;
-	TestableMailSender testableMailSender;
+	NiceMock<TestableSmsSender> testableSmsSender;
+	NiceMock<TestableMailSender> testableMailSender;
 
 protected:
 	void SetUp() override {
@@ -106,25 +106,28 @@ TEST_F(BookingItem, 시간대별인원제한이있다같은시간대가다르면Capacity차있어도스케
 TEST_F(BookingItem, 예약완료시SMS는무조건발송) {
 	Schedule* schedule = new Schedule{ ON_THE_HOUR, CAPACITY_PER_HOUR, CUSTOMER };
 
-	bookingScheduler.addSchedule(schedule);
+	EXPECT_CALL(testableSmsSender, send(schedule))
+		.Times(1);
 
-	EXPECT_EQ(true, testableSmsSender.isSendMethodIsCalled());
+	bookingScheduler.addSchedule(schedule);
 }
 
 TEST_F(BookingItem, 이메일이없는경우에는이메일미발송) {
 	Schedule* schedule = new Schedule{ ON_THE_HOUR, CAPACITY_PER_HOUR, CUSTOMER };
 
-	bookingScheduler.addSchedule(schedule);
+	EXPECT_CALL(testableMailSender, sendMail(schedule))
+		.Times(0);
 
-	EXPECT_EQ(0, testableMailSender.getCountSendMailMethodIsCalled());
+	bookingScheduler.addSchedule(schedule);
 }
 
 TEST_F(BookingItem, 이메일이있는경우에는이메일발송) {
 	Schedule* schedule = new Schedule{ ON_THE_HOUR, CAPACITY_PER_HOUR, CUSTOMER_WITH_MAIL };
 
-	bookingScheduler.addSchedule(schedule);
+	EXPECT_CALL(testableMailSender, sendMail(schedule))
+		.Times(1);
 
-	EXPECT_EQ(1, testableMailSender.getCountSendMailMethodIsCalled());
+	bookingScheduler.addSchedule(schedule);
 }
 
 TEST_F(BookingItem, 현재날짜가일요일인경우예약불가예외처리) {
