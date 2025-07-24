@@ -1,8 +1,25 @@
 #include "gmock/gmock.h"
 #include "booking_scheduler.cpp"
 
-TEST(BookingSchedulerTest, 예약은정시에만가능하다정시가아닌경우예약불가) {
+using namespace std;
 
+TEST(BookingSchedulerTest, 예약은정시에만가능하다정시가아닌경우예약불가) {
+	tm notOnTheHour = { 0 };
+	notOnTheHour.tm_year = 2021 - 1900;
+	notOnTheHour.tm_mon = 03 - 1;
+	notOnTheHour.tm_mday = 26;
+	notOnTheHour.tm_hour = 9;
+	notOnTheHour.tm_min = 5;
+	notOnTheHour.tm_isdst = -1;
+	mktime(&notOnTheHour);
+
+	Customer customer{ "Fake name", "010-1234-5678" };
+	Schedule* schedule = new Schedule{ notOnTheHour, 1, customer };
+	BookingScheduler bookingScheduler{ 3 };
+
+	EXPECT_THROW({
+		bookingScheduler.addSchedule(schedule);
+		}, runtime_error);
 }
 
 TEST(BookingSchedulerTest, 예약은정시에만가능하다정시인경우예약가능) {
