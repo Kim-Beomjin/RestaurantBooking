@@ -29,6 +29,7 @@ public:
 
 	BookingScheduler bookingScheduler{ CAPACITY_PER_HOUR };
 	TestableSmsSender testableSmsSender;
+	TestableMailSender testableMailSender;
 
 protected:
 	void SetUp() override {
@@ -36,6 +37,7 @@ protected:
 		ON_THE_HOUR = getTime(2021, 3, 26, 9, 0);
 
 		bookingScheduler.setSmsSender(&testableSmsSender);
+		bookingScheduler.setMailSender(&testableMailSender);
 	}
 };
 
@@ -91,9 +93,7 @@ TEST_F(BookingItem, 예약완료시SMS는무조건발송) {
 }
 
 TEST_F(BookingItem, 이메일이없는경우에는이메일미발송) {
-	TestableMailSender testableMailSender;
 	Schedule* schedule = new Schedule{ ON_THE_HOUR, CAPACITY_PER_HOUR, CUSTOMER };
-	bookingScheduler.setMailSender(&testableMailSender);
 
 	bookingScheduler.addSchedule(schedule);
 
@@ -101,9 +101,7 @@ TEST_F(BookingItem, 이메일이없는경우에는이메일미발송) {
 }
 
 TEST_F(BookingItem, 이메일이있는경우에는이메일발송) {
-	TestableMailSender testableMailSender;
 	Schedule* schedule = new Schedule{ ON_THE_HOUR, CAPACITY_PER_HOUR, CUSTOMER_WITH_MAIL };
-	bookingScheduler.setMailSender(&testableMailSender);
 
 	bookingScheduler.addSchedule(schedule);
 
