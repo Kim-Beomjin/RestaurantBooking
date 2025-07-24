@@ -44,7 +44,18 @@ TEST_F(BookingItem, 예약은정시에만가능하다정시인경우예약가능) {
 }
 
 TEST_F(BookingItem, 시간대별인원제한이있다같은시간대에Capacity초과할경우예외발생) {
+	Schedule* schedule = new Schedule{ ON_THE_HOUR, CAPACITY_PER_HOUR, CUSTOMER };
+	bookingScheduler.addSchedule(schedule);
 
+	try {
+		Schedule* newSchedule = new Schedule{ ON_THE_HOUR, UNDER_CAPACITY, CUSTOMER };
+		bookingScheduler.addSchedule(newSchedule);
+		FAIL();
+	}
+	catch (runtime_error& e) {
+		EXPECT_EQ(string{ e.what() },
+			string{ "Number of people is over restaurant capacity per hour" });
+	}
 }
 
 TEST_F(BookingItem, 시간대별인원제한이있다같은시간대가다르면Capacity차있어도스케쥴추가성공) {
