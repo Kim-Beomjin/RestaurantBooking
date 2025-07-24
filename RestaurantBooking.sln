@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RestaurantBooking", "RestaurantBooking\RestaurantBooking.vcxproj", "{5727A46B-B4DD-491D-8492-816E30D0E5CD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "솔루션 항목", "솔루션 항목", "{2A3A057F-5D22-31FD-628C-DF5EF75AEF1E}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5727A46B-B4DD-491D-8492-816E30D0E5CD}.Debug|x64.ActiveCfg = Debug|x64
+		{5727A46B-B4DD-491D-8492-816E30D0E5CD}.Debug|x64.Build.0 = Debug|x64
+		{5727A46B-B4DD-491D-8492-816E30D0E5CD}.Debug|x86.ActiveCfg = Debug|Win32
+		{5727A46B-B4DD-491D-8492-816E30D0E5CD}.Debug|x86.Build.0 = Debug|Win32
+		{5727A46B-B4DD-491D-8492-816E30D0E5CD}.Release|x64.ActiveCfg = Release|x64
+		{5727A46B-B4DD-491D-8492-816E30D0E5CD}.Release|x64.Build.0 = Release|x64
+		{5727A46B-B4DD-491D-8492-816E30D0E5CD}.Release|x86.ActiveCfg = Release|Win32
+		{5727A46B-B4DD-491D-8492-816E30D0E5CD}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1E48B1FB-ECC2-44FB-8E9A-A5317EE92998}
+	EndGlobalSection
+EndGlobal
