@@ -130,13 +130,12 @@
     <ClCompile Include="booking_scheduler.cpp" />
     <ClCompile Include="customer.cpp" />
     <ClCompile Include="mail_sender.cpp" />
-    <ClCompile Include="monday_booking_scheduler.cpp" />
     <ClCompile Include="schedule.cpp" />
     <ClCompile Include="sms_sender.cpp" />
-    <ClCompile Include="sunday_booking_scheduler.cpp" />
     <ClCompile Include="test.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"> %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <ClCompile Include="testable_booking_scheduler.cpp" />
     <ClCompile Include="testable_mail_sender.cpp" />
     <ClCompile Include="testable_sms_sender.cpp" />
   </ItemGroup>
