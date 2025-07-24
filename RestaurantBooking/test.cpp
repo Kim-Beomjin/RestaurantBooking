@@ -2,6 +2,7 @@
 #include "booking_scheduler.cpp"
 
 using namespace std;
+using namespace testing;
 
 TEST(BookingSchedulerTest, 예약은정시에만가능하다정시가아닌경우예약불가) {
 	tm notOnTheHour = { 0 };
@@ -23,7 +24,22 @@ TEST(BookingSchedulerTest, 예약은정시에만가능하다정시가아닌경우예약불가) {
 }
 
 TEST(BookingSchedulerTest, 예약은정시에만가능하다정시인경우예약가능) {
+	tm onTheHour = { 0 };
+	onTheHour.tm_year = 2021 - 1900;
+	onTheHour.tm_mon = 03 - 1;
+	onTheHour.tm_mday = 26;
+	onTheHour.tm_hour = 9;
+	onTheHour.tm_min = 0;
+	onTheHour.tm_isdst = -1;
+	mktime(&onTheHour);
 
+	Customer customer{ "Fake name", "010-1234-5678" };
+	Schedule* schedule = new Schedule{ onTheHour, 1, customer };
+	BookingScheduler bookingScheduler{ 3 };
+
+	bookingScheduler.addSchedule(schedule);
+
+	EXPECT_EQ(true, bookingScheduler.hasSchedule(schedule));
 }
 
 TEST(BookingSchedulerTest, 시간대별인원제한이있다같은시간대에Capacity초과할경우예외발생) {
