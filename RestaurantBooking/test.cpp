@@ -7,6 +7,11 @@
 using namespace std;
 using namespace testing;
 
+class MockCustomer : public Customer {
+public:
+	MOCK_METHOD(string, getEmail, (), (override));
+};
+
 class BookingItem : public Test {
 public:
 	tm getTime(int year, int mon, int day, int hour, int min) {
@@ -25,8 +30,11 @@ public:
 	tm ON_THE_HOUR;
 	tm SUNDAY_ON_THE_HOUR;
 	tm MONDAY_ON_THE_HOUR;
-	Customer CUSTOMER{ "Fake name", "010-1234-5678" };
-	Customer CUSTOMER_WITH_MAIL{ "Fake name", "010-1234-5678", "test@test.com" };
+
+	MockCustomer CUSTOMER;
+	MockCustomer CUSTOMER_WITH_MAIL;
+	//Customer CUSTOMER{ "Fake name", "010-1234-5678" };
+	//Customer CUSTOMER_WITH_MAIL{ "Fake name", "010-1234-5678", "test@test.com" };
 	const int UNDER_CAPACITY = 1;
 	const int CAPACITY_PER_HOUR = 3;
 
@@ -41,9 +49,14 @@ protected:
 		SUNDAY_ON_THE_HOUR = getTime(2021, 3, 28, 17, 0);
 		MONDAY_ON_THE_HOUR = getTime(2024, 6, 3, 17, 0);
 
-
 		bookingScheduler.setSmsSender(&testableSmsSender);
 		bookingScheduler.setMailSender(&testableMailSender);
+
+		EXPECT_CALL((CUSTOMER), getEmail)
+			.WillRepeatedly(Return(""));
+		EXPECT_CALL((CUSTOMER_WITH_MAIL), getEmail)
+			.WillRepeatedly(Return("test@test.com"));
+
 	}
 };
 
